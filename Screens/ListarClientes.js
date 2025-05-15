@@ -63,7 +63,7 @@ export default function ListarClientes({ route, navigation }) {
                                         // en este punto le quise agregar esos emojis para 
                                         // que se viera mas bonito XD
                                         "⚠ Confirmar eliminación ⚠",
-                                        "¿Estás seguro de que deseas eliminar este cliente de la lista?",
+                                        "¿Estás seguro de que deseas eliminar este cliente?",
                                         [
                                             { text: "Cancelar ❌", style: "cancel" },
                                             { text: "Eliminar ✔", onPress: () => eliminarCliente(index) }
