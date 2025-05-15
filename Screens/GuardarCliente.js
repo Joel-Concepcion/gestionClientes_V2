@@ -2,39 +2,28 @@ import { StyleSheet, View, Text, Alert, TextInput, TouchableOpacity } from "reac
 import { Picker } from '@react-native-picker/picker';
 
 
-import React, {useState} from 'react';
-//import React from "react";
+import React, { useState } from 'react';
 
 
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import { useNavigation } from "@react-navigation/native";
 
-export default function Settings(){
-    const navigation = useNavigation();
-    const [cedula, setCedula] = useState("");
-    const [nombre, setNombres] = useState("");
-    const [apellidos, setApellidos] = useState("");
-    const [fechaNacimiento, setfechaNacimiento] = useState("");
-    const [sexo, setSexo] = useState("");
+export default function GuardarCliente({ route, navigation }) {
 
-    const [Clientes, setClientes] = useState([]);
-
-   const formatCedula = (text) => {
-    let cleaned = text.replace(/[^0-9A-Za-z]/g, "");
-    if (cleaned.length > 14) return text;  
-    if (cleaned.length > 3 && cleaned[3] !== "-") {
-        cleaned = cleaned.slice(0, 3) + "-" + cleaned.slice(3);
-    }
-    if (cleaned.length > 10 && cleaned[10] !== "-") {
-        cleaned = cleaned.slice(0, 10) + "-" + cleaned.slice(10);
-    }
-    return cleaned.toUpperCase();
-};
-
+    const formatCedula = (text) => {
+        let cleaned = text.replace(/[^0-9A-Za-z]/g, "");
+        if (cleaned.length > 14) return text;
+        if (cleaned.length > 3 && cleaned[3] !== "-") {
+            cleaned = cleaned.slice(0, 3) + "-" + cleaned.slice(3);
+        }
+        if (cleaned.length > 10 && cleaned[10] !== "-") {
+            cleaned = cleaned.slice(0, 10) + "-" + cleaned.slice(10);
+        }
+        return cleaned.toUpperCase();
+    };
 
     const formatFecha = (text) => {
         let cleaned = text.replace(/[^0-9-]/g, "");
-        cleaned = cleaned.replace(/-{2,}/g, "-"); 
+        cleaned = cleaned.replace(/-{2,}/g, "-");
         if (cleaned.length > 4 && cleaned[4] !== "-") {
             cleaned = cleaned.slice(0, 4) + "-" + cleaned.slice(4);
         }
@@ -42,115 +31,107 @@ export default function Settings(){
             cleaned = cleaned.slice(0, 7) + "-" + cleaned.slice(7);
         }
         return cleaned;
-};
+    };
+
+    const { guardarNuevo } = route.params;
+
+    const [cedula, setCedula] = useState("");
+    const [nombre, setNombres] = useState("");
+    const [apellidos, setApellidos] = useState("");
+    const [fechaNacimiento, setFechaNacimiento] = useState("");
+    const [sexo, setSexo] = useState("");
+
+
 
     const guardar = () => {
-        if (!cedula || !nombre) return null;
+        if (!cedula || !nombre) return;
+
         const nuevoCliente = {
             nuevaCedula: cedula,
             nuevoNombre: nombre,
             nuevosApellidos: apellidos,
             nuevaFecha: fechaNacimiento,
             nuevoSexo: sexo,
-        }
+        };
 
-        setClientes([nuevoCliente, ...Clientes])
-        Alert.alert('Datos almacenados', `  
-            Cédula: ${cedula}
-            Nombres: ${nombre}
-            Apellidos: ${apellidos}
-            Fecha Nacimiento: ${fechaNacimiento}
-            Sexo: ${sexo}
-            `);
+        guardarNuevo(nuevoCliente);
         navigation.goBack();
+
         setCedula('');
         setNombres('');
         setApellidos('');
-        setfechaNacimiento('');
+        setFechaNacimiento('');
         setSexo('');
     };
-
-    const eliminarCliente = (cedula) => {
-    const nuevaLista = clientes.filter(cliente => cliente.nuevaCedula !== cedula);
-    navigation.setParams({ clientes: JSON.stringify(nuevaLista) });
-};
-
-
     return (
-        <View style={{backgroundColor:'#d6eaf8', flex:1, justifyContent:'center', alignItems:'center'}}>
+        <View style={styles.container}>
+            <View style={styles.containerF}>
             <Text style={styles.textEna}>Registrar datos del cliente</Text>
-        
-        {/*Input para agregar los datos del cliente*/}
-        <View style={styles.cajaTx}>
 
-        <Text style={styles.lebel}>Cédula:</Text>
-        <TextInput
-            style={styles.input}
-            value={cedula}
-            onChangeText={(text) => setCedula(formatCedula(text))} 
-            placeholder="Ej: 365-130995-0002H"
-            maxLength={16}
-        />
+            {/*Input para agregar los datos del cliente*/}
+            <View style={styles.cajaTx}>
 
-         <Text style={styles.lebel}>Nombres:</Text>
-        <TextInput
-            style={styles.input}
-            value={nombre}
-            onChangeText={setNombres} 
-            placeholder="Ej: Juan Carlos"
-        />
+                <Text style={styles.lebel}>Cédula:</Text>
+                <TextInput
+                    style={styles.input}
+                    value={cedula}
+                    onChangeText={(text) => setCedula(formatCedula(text))}
+                    placeholder="Ej: 365-130995-0002H"
+                    maxLength={16}
+                />
 
-         <Text style={styles.lebel}>Apellidos:</Text>
-        <TextInput
-            style={styles.input}
-            value={apellidos}
-            onChangeText={setApellidos} 
-            placeholder="Ej: Pérez López"
-        />
+                <Text style={styles.lebel}>Nombres:</Text>
+                <TextInput
+                    style={styles.input}
+                    value={nombre}
+                    onChangeText={setNombres}
+                    placeholder="Ej: Juan Carlos"
+                />
 
-         <Text style={styles.lebel}>Fecha de Nacimiento:</Text>
-        <TextInput
-            style={styles.input}
-            value={fechaNacimiento}
-            onChangeText={(text) => setfechaNacimiento(formatFecha(text))}
-            placeholder="YYYY-MM-DD"
-            keyboardType="numeric"
-            maxLength={10}
-        />
-        <Text style={styles.lebel}>Sexo:</Text>
+                <Text style={styles.lebel}>Apellidos:</Text>
+                <TextInput
+                    style={styles.input}
+                    value={apellidos}
+                    onChangeText={setApellidos}
+                    placeholder="Ej: Pérez López"
+                />
 
-        <View style={styles.picker}>
-            <Picker 
-                selectedValue={sexo}
-                onValueChange={(itemValue) => setSexo(itemValue)}
-            >
-                <Picker.Item label="Seleccione..." value="" style={styles.itemS}/>
-                <Picker.Item label="Masculino" value="Masculino" style={styles.itemS}/>
-                <Picker.Item label="Femenino" value="Femenino" style={styles.itemS}/>
-            </Picker>
-         </View>
+                <Text style={styles.lebel}>Fecha de Nacimiento:</Text>
+                <TextInput
+                    style={styles.input}
+                    value={fechaNacimiento}
+                    onChangeText={(text) => setFechaNacimiento(formatFecha(text))}
+                    placeholder="YYYY-MM-DD"
+                    keyboardType="numeric"
+                    maxLength={10}
+                />
+                <Text style={styles.lebel}>Sexo:</Text>
+
+                <View style={styles.picker}>
+                    <Picker
+                        selectedValue={sexo}
+                        onValueChange={(itemValue) => setSexo(itemValue)}
+                    >
+                        <Picker.Item label="Seleccione..." value="" style={styles.itemS} />
+                        <Picker.Item label="Masculino" value="Masculino" style={styles.itemS} />
+                        <Picker.Item label="Femenino" value="Femenino" style={styles.itemS} />
+                    </Picker>
+                </View>
 
 
-       
+
+            </View>
+
+            {/*Boton de Registrar y listar*/}
+            <View style={styles.contBoton}>
+                <TouchableOpacity style={styles.button} onPress={guardar}>
+                    <FontAwesome6 name="pen-clip" size={25} color="#2980b9" style={styles.pen} />
+                    <Text style={styles.buttonText}>Guardar</Text>
+                </TouchableOpacity>
+            </View>
+            </View>
         </View>
 
-        {/*Botones de Registrar y listar*/}
-        <View style={styles.contBoton}>
-            <TouchableOpacity style={styles.button} onPress={guardar}>
-                <FontAwesome6 name="pen-clip" size={25} color="#2980b9"  style={styles.pen}/>
-                <Text style={styles.buttonText}>Guardar</Text>
-            </TouchableOpacity>
-
-           {/*<TouchableOpacity style={styles.button} 
-            onPress={() => navigation.navigate("ListarProductos", {clientes: JSON.stringify(Clientes) })}>
-                <FontAwesome6 name="clipboard-list" size={25} color="#2980b9" style={styles.pen}/>
-            <Text style={styles.buttonText}>Listar</Text>
-        
-             </TouchableOpacity>*/} 
-        </View>
-
-        </View>
-    
     )
 };
 
@@ -158,18 +139,24 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
-        backgroundColor: 'blue',
+        backgroundColor: '#d6eaf8',
         alignItems: 'center',
+        
+    },
+    containerF:{
+        marginBottom: 100,
+        marginLeft: 50,
     },
     textEna: {
         fontSize: 30,
         color: "#3498db",
-        fontWeight:"bold",
+        fontWeight: "bold",
+        marginBottom: 10,
     },
     cajaTx: {
-        marginTop: 20,
+        marginTop: 5,
     },
-    contBoton:{
+    contBoton: {
         marginTop: 10,
     },
     button: {
@@ -182,7 +169,7 @@ const styles = StyleSheet.create({
         width: 300,
         height: 50,
         marginTop: 5,
-        
+
         justifyContent: 'center',
     },
     buttonText: {
@@ -192,7 +179,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#2980b9',
     },
-    pen:{
+    pen: {
         marginRight: 5,
     },
     lebel: {
@@ -211,7 +198,7 @@ const styles = StyleSheet.create({
         width: 300,
         height: 50,
     },
-    picker:{
+    picker: {
         backgroundColor: '#85c1e9',
         width: 300,
         height: 50,
